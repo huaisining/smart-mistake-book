@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  notebooks     Notebook[]
+  mistakes      Mistake[]
+  tags          Tag[]
+  reviewSessions ReviewSession[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+model Notebook {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  color       String   @default("#3b82f6")
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  mistakes    Mistake[]
+
+  @@map("notebooks")
+}
+
+model Tag {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  color       String   @default("#6b7280")
+  userId      String?
+  createdAt   DateTime @default(now())
+
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  mistakes    MistakeTag[]
+
+  @@map("tags")
+}
+
+model Mistake {
+  id              String   @id @default(cuid())
+  title           String?
+  content         String
+  answer          String?
+  explanation     String?
+  imageUrl        String?
+  knowledgePoints String?
+  mistakeType     String   @default("concept")
+  difficulty      Int      @default(3)
+  masteryLevel    Int      @default(0)
+  nextReviewDate  DateTime @default(now())
+  interval        Int      @default(1)
+  repetitions     Int      @default(0)
+  elapser         Float    @default(2.5)
+  timesReviewed   Int      @default(0)
+  notebookId      String
+  userId          String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  notebook        Notebook @relation(fields: [notebookId], references: [id], onDelete: Cascade)
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tags            MistakeTag[]
+  reviewResults   ReviewResult[]
+
+  @@index([userId, masteryLevel])
+  @@index([userId, nextReviewDate])
+  @@map("mistakes")
+}
+
+model MistakeTag {
+  id          String   @id @default(cuid())
+  mistakeId   String
+  tagId       String
+  createdAt   DateTime @default(now())
+
+  mistake     Mistake  @relation(fields: [mistakeId], references: [id], onDelete: Cascade)
+  tag         Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@unique([mistakeId, tagId])
+  @@map("mistake_tags")
+}
+
+model ReviewSession {
+  id          String    @id @default(cuid())
+  userId      String
+  type        String    @default("scheduled")
+  startTime   DateTime  @default(now())
+  endTime     DateTime?
+  totalCards  Int       @default(0)
+  correctCards Int      @default(0)
+  createdAt   DateTime  @default(now())
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  results     ReviewResult[]
+
+  @@map("review_sessions")
+}
+
+model ReviewResult {
+  id            String   @id @default(cuid())
+  sessionId     String
+  mistakeId     String
+  rating        String
+  reviewTime    DateTime @default(now())
+
+  session       ReviewSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  mistake       Mistake       @relation(fields: [mistakeId], references: [id], onDelete: Cascade)
+
+  @@map("review_results")
+}
