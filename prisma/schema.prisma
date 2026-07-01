@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -33,12 +33,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?
-  access_token      String?
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?
+  id_token          String? @db.Text
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -69,7 +69,7 @@ model VerificationToken {
 model Notebook {
   id          String   @id @default(cuid())
   name        String
-  description String?
+  description String?  @db.Text
   color       String   @default("#3b82f6")
   userId      String
   createdAt   DateTime @default(now())
@@ -97,11 +97,11 @@ model Tag {
 model Mistake {
   id              String   @id @default(cuid())
   title           String?
-  content         String
-  answer          String?
-  explanation     String?
+  content         String   @db.Text
+  answer          String?  @db.Text
+  explanation     String?  @db.Text
   imageUrl        String?
-  knowledgePoints String?
+  knowledgePoints String?  @db.Text
   mistakeType     String   @default("concept")
   difficulty      Int      @default(3)
   masteryLevel    Int      @default(0)
