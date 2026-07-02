@@ -1,9 +1,7 @@
-// 应用内更新检测服务
-// 启动时检查服务器上的最新版本，有新版本提示用户下载安装
+// 搴旂敤鍐呮洿鏂版娴嬫湇鍔?// 鍚姩鏃舵鏌ユ湇鍔″櫒涓婄殑鏈€鏂扮増鏈紝鏈夋柊鐗堟湰鎻愮ず鐢ㄦ埛涓嬭浇瀹夎
 
-const UPDATE_CONFIG_URL = "https://gitee.com/huaisining/smart-mistake-book/raw/master/version.json";
-const CURRENT_VERSION = 2; // 与 build.gradle 中的 versionCode 保持一致
-
+const UPDATE_CONFIG_URL = "https://gitee.com/jiang-zhengyu666/smart-mistake-book/raw/master/version.json";
+const CURRENT_VERSION = 2; // 涓?build.gradle 涓殑 versionCode 淇濇寔涓€鑷?
 export interface UpdateInfo {
   versionCode: number;
   versionName: string;
@@ -28,6 +26,6 @@ export async function checkForUpdate(): Promise<UpdateInfo | null> {
 }
 
 export function downloadUpdate(apkUrl: string): void {
-  // 用系统浏览器下载 APK，下载完成后用户点击即可安装
+  // 鐢ㄧ郴缁熸祻瑙堝櫒涓嬭浇 APK锛屼笅杞藉畬鎴愬悗鐢ㄦ埛鐐瑰嚮鍗冲彲瀹夎
   window.open(apkUrl, "_blank");
 }
