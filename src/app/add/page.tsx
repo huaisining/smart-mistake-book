@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { getNotebooks, createMistake } from "@/lib/local-db";
 import Sidebar from "@/components/Sidebar";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
+import { fullAnalyzeMistake, callAIApi } from "@/lib/ai-service";
 import toast, { Toaster } from "react-hot-toast";
 
 interface ExamPoint { name: string; detail: string; }
@@ -48,14 +50,15 @@ export default function AddMistakePage() {
   useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chatMessages]);
 
   const fetchNotebooks = async () => {
-    try { const r = await fetch("/api/notebooks"); if (r.ok) setNotebooks(await r.json()); }
+    try { setNotebooks(await getNotebooks()); }
     catch (e) { console.error(e); } finally { setLoading(false); }
   };
 
   const handleFileSelect = async (file: File) => {
-    const fd = new FormData(); fd.append("file", file);
-    try { const r = await fetch("/api/upload", { method: "POST", body: fd }); if (r.ok) { setUploadedImageUrl((await r.json()).url); toast.success("图片上传成功！"); } else toast.error((await r.json()).error || "上传失败"); }
-    catch { toast.error("网络错误，请重试"); }
+    const reader = new FileReader();
+    reader.onload = () => { setUploadedImageUrl(reader.result as string); toast.success("图片已就绪！"); };
+    reader.onerror = () => toast.error("读取文件失败");
+    reader.readAsDataURL(file);
   };
 
   const handleDrop = (e: React.DragEvent) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith("image/")) handleFileSelect(f); };
@@ -66,9 +69,8 @@ export default function AddMistakePage() {
     if (!uploadedImageUrl && !textInput) { toast.error("请上传图片或输入题目内容"); return; }
     setStep(2); setIsAnalyzing(true);
     try {
-      const r = await fetch("/api/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ imageUrl: uploadedImageUrl, questionText: textInput, fullAnalysis: true }) });
-      if (r.ok) { setAnalysisResult(await r.json()); setStep(3); toast.success("AI分析完成！"); }
-      else { toast.error((await r.json()).error || "分析失败"); setStep(1); }
+      const result = await fullAnalyzeMistake(uploadedImageUrl || undefined, textInput || undefined);
+      setAnalysisResult(result); setStep(3); toast.success("AI分析完成！");
     } catch { toast.error("AI分析失败，请重试"); setStep(1); }
     finally { setIsAnalyzing(false); }
   };
@@ -78,9 +80,13 @@ export default function AddMistakePage() {
     const u = { role: "user", content: chatInput }; const msgs = [...chatMessages, u];
     setChatMessages(msgs); setChatInput(""); setIsSending(true);
     try {
-      const r = await fetch("/api/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: msgs, context: analysisResult }) });
-      if (r.ok) setChatMessages([...msgs, { role: "assistant", content: (await r.json()).reply }]);
-      else setChatMessages([...msgs, { role: "assistant", content: "AI回复失败，请重试。" }]);
+      try {
+        const reply = await callAIApi([
+          { role: "system", content: "你是基于错题上下文回答问题的辅导老师。" + JSON.stringify(analysisResult) },
+          ...msgs
+        ], 2000, false);
+        setChatMessages([...msgs, { role: "assistant", content: reply }]);
+      } catch { setChatMessages([...msgs, { role: "assistant", content: "AI回复失败，请重试。" }]); }
     } catch { setChatMessages([...msgs, { role: "assistant", content: "网络错误，请重试。" }]); }
     finally { setIsSending(false); }
   };
@@ -89,15 +95,14 @@ export default function AddMistakePage() {
   const handleSave = async () => {
     if (!selectedNotebook || !analysisResult) return; setSaving(true);
     try {
-      const saveBody = JSON.stringify({
+      const m = await createMistake({
         title: analysisResult.title, content: analysisResult.questionText, answer: analysisResult.answer,
         explanation: analysisResult.explanation,
-        knowledgePoints: analysisResult.examPoints.map(p => p.name).concat(analysisResult.knowledgePoints),
+        knowledgePoints: analysisResult.examPoints.map(p => p.name).concat(analysisResult.knowledgePoints).join(','),
         mistakeType: analysisResult.mistakeType, difficulty: analysisResult.difficulty, notebookId: selectedNotebook
       });
-      const r = await fetch("/api/mistakes", { method: "POST", headers: { "Content-Type": "application/json" }, body: saveBody });
-      if (r.ok) { toast.success("错题保存成功！"); router.push("/mistakes"); }
-      else toast.error((await r.json()).error || "保存失败");
+      if (m) { toast.success("错题保存成功！"); router.push("/mistakes"); }
+      else toast.error("保存失败");
     } catch { toast.error("网络错误，请重试"); } finally { setSaving(false); }
   };
 

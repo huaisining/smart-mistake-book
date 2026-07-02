@@ -3,6 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { getStats } from '@/lib/local-db';
 import Sidebar from '@/components/Sidebar';
 import {
   LineChart,
@@ -41,11 +42,8 @@ export default function DashboardPage() {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('/api/stats');
-      if (response.ok) {
-        const data = await response.json();
-        setStats(data);
-      }
+      const data = await getStats();
+      setStats(data);
     } catch (error) {
       console.error('Failed to fetch stats:', error);
     } finally {

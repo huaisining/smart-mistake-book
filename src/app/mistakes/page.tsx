@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
+import { getMistakes } from '@/lib/local-db';
 
 interface Mistake {
   id: string;
@@ -42,11 +43,8 @@ export default function MistakesPage() {
 
   const fetchMistakes = async () => {
     try {
-      const response = await fetch(`/api/mistakes?${filter === 'due' ? 'due=true' : ''}`);
-      if (response.ok) {
-        const data = await response.json();
-        setMistakes(data);
-      }
+      const data = await getMistakes(filter === 'due' ? { due: true } : undefined);
+      setMistakes(data);
     } catch (error) {
       console.error('Failed to fetch mistakes:', error);
     } finally {

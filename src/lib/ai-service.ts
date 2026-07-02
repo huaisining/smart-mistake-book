@@ -7,14 +7,14 @@ export interface AnalysisResult {
   difficulty: number;
 }
 
-async function callAIApi(
+export async function callAIApi(
   messages: Array<{ role: string; content: string | Array<any> }>,
   maxTokens: number = 1000,
   useJsonFormat: boolean = true
 ): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY || process.env.GEMINI_API_KEY;
-  const baseUrl = process.env.OPENAI_BASE_URL || "https://api.openai.com/v1";
-  const model = process.env.AI_MODEL || "gpt-4o";
+  const apiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+  const baseUrl = process.env.NEXT_PUBLIC_OPENAI_BASE_URL || "https://api.openai.com/v1";
+  const model = process.env.NEXT_PUBLIC_AI_MODEL || "gpt-4o";
   if (!apiKey) throw new Error("AI API key not configured");
   const requestBody: any = { model, messages, max_tokens: maxTokens };
   if (useJsonFormat) requestBody.response_format = { type: "json_object" };
@@ -44,9 +44,6 @@ async function callAIApi(
 function getImageContent(imageUrl: string): string {
   if (imageUrl.startsWith("data:")) return imageUrl;
   if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) return imageUrl;
-  const fs = require("fs"); const path = require("path");
-  const filePath = path.join(process.cwd(), "public", imageUrl.replace(/^\//, ""));
-  if (fs.existsSync(filePath)) { const buffer = fs.readFileSync(filePath); const ext = path.extname(filePath).toLowerCase(); const mimeMap: Record<string, string> = { ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".gif": "image/gif", ".webp": "image/webp" }; return "data:" + (mimeMap[ext] || "image/jpeg") + ";base64," + buffer.toString("base64"); }
   return imageUrl;
 }
 

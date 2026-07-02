@@ -1,0 +1,40 @@
+
+> mistake-book@1.0.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 1934ms
+ ○ Compiling / ...
+ ✓ Compiled / in 27.8s (519 modules)
+ ✓ Compiled in 1032ms (263 modules)
+ GET / 200 in 54ms
+ ○ Compiling /login ...
+ ✓ Compiled /login in 861ms (509 modules)
+ GET /login 200 in 1084ms
+ ○ Compiling /add ...
+ ✓ Compiled /add in 2.5s (686 modules)
+ GET /add 200 in 2799ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 9.1s (1740 modules)
+ GET /dashboard 200 in 9595ms
+ ○ Compiling /mistakes ...
+ ✓ Compiled /mistakes in 642ms (1746 modules)
+ GET /mistakes 200 in 739ms
+ ○ Compiling /notebooks ...
+ ✓ Compiled /notebooks in 976ms (1755 modules)
+ GET /notebooks 200 in 1092ms
+ ○ Compiling /review ...
+ ✓ Compiled /review in 709ms (1761 modules)
+ GET /review 200 in 798ms
+ GET / 200 in 53ms
+   Reload env: .env
+ ✓ Compiled in 11.1s (1679 modules)
+ ✓ Compiled in 159ms (889 modules)
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET /dashboard 200 in 433ms
+ ○ Compiling /add ...
+ ✓ Compiled /add in 1171ms (867 modules)

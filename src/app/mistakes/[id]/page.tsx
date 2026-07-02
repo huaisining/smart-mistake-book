@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
+import { getMistake, updateMistake, deleteMistake } from '@/lib/local-db';
 import toast, { Toaster } from 'react-hot-toast';
 
 interface MistakeDetail {
@@ -45,17 +46,14 @@ export default function MistakeDetailPage() {
 
   const fetchMistake = async () => {
     try {
-      const response = await fetch(`/api/mistakes/${params.id}`);
-      if (response.ok) {
-        const data = await response.json();
-        setMistake(data);
+      const data = await getMistake(params.id as string);
+      setMistake(data);
         setEditData({
           title: data.title || '',
           answer: data.answer || '',
           explanation: data.explanation || '',
           masteryLevel: data.masteryLevel
         });
-      }
     } catch (error) {
       console.error('Failed to fetch mistake:', error);
     } finally {

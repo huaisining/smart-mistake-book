@@ -1,13 +1,14 @@
 'use client';
 
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Sidebar from '@/components/Sidebar';
 import toast, { Toaster } from 'react-hot-toast';
 import { Mistake } from '@/types';
+import { getMistakes, reviewMistake } from '@/lib/local-db';
 
-export default function ReviewPage() {
+function ReviewContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const preselectedId = searchParams.get('id');
@@ -25,10 +26,8 @@ export default function ReviewPage() {
 
   const fetchDueMistakes = async () => {
     try {
-      const response = await fetch('/api/mistakes?due=true');
-      if (response.ok) {
-        const data = await response.json();
-        setDueMistakes(data);
+      const data = await getMistakes({ due: true });
+      setDueMistakes(data);
         
         // If a specific ID was passed, find it
         if (preselectedId) {
@@ -41,7 +40,6 @@ export default function ReviewPage() {
         } else if (data.length > 0) {
           setCurrentMistake(data[0]);
         }
-      }
     } catch (error) {
       console.error('Failed to fetch due mistakes:', error);
     } finally {
@@ -53,16 +51,8 @@ export default function ReviewPage() {
     if (!currentMistake) return;
 
     try {
-      const response = await fetch('/api/review', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          mistakeId: currentMistake.id,
-          rating
-        })
-      });
-
-      if (response.ok) {
+      const result = await reviewMistake(currentMistake.id, rating);
+      if (result) {
         toast.success('复习完成！');
         
         // Move to next mistake
@@ -230,5 +220,18 @@ export default function ReviewPage() {
 
       <Toaster position="top-right" />
     </div>
+  );
+
+}
+
+export default function ReviewPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    }>
+      <ReviewContent />
+    </Suspense>
   );
 }

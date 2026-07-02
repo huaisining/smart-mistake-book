@@ -73,8 +73,7 @@ export default function NotebooksPage() {
         setNewDesc("");
         fetchNotebooks();
       } else {
-        const error = await response.json();
-        toast.error(error.error || "创建失败");
+        toast.error('创建失败');
       }
     } catch (error) {
       toast.error("网络错误，请重试");

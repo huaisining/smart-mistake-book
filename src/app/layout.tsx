@@ -1,8 +1,10 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import "./globals.css";
-import "katex/dist/katex.min.css";
+// katex removed for static export
+
 import { Inter } from "next/font/google";
-import Providers from "@/components/Providers";
+import { AuthProvider } from "@/lib/auth-context";
+import UpdatePrompt from "@/components/UpdatePrompt";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,7 +21,10 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <AuthProvider>
+          {children}
+          <UpdatePrompt />
+        </AuthProvider>
       </body>
     </html>
   );

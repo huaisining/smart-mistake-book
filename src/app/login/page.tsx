@@ -2,51 +2,35 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
+import { useAuth } from "@/lib/auth-context";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login, register: localRegister } = useAuth();
   const [isRegistering, setIsRegistering] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    name: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "", name: "" });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     try {
       if (isRegistering) {
-        const response = await fetch("/api/register", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData),
-        });
-
-        if (response.ok) {
+        const result = await localRegister(formData.email, formData.password, formData.name);
+        if (result.success) {
           toast.success("注册成功！请登录");
           setIsRegistering(false);
         } else {
-          const error = await response.json();
-          toast.error(error.error || "注册失败");
+          toast.error(result.error || "注册失败");
         }
       } else {
-        const result = await signIn("credentials", {
-          email: formData.email,
-          password: formData.password,
-          redirect: false,
-        });
-
-        if (result?.error) {
-          toast.error("登录失败，请检查账号密码");
+        const result = await login(formData.email, formData.password);
+        if (!result.success) {
+          toast.error(result.error || "登录失败，请检查账号密码");
         } else {
           toast.success("登录成功！");
           router.push("/dashboard");
-          router.refresh();
         }
       }
     } catch (error) {
@@ -60,7 +44,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-accent-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="text-5xl mb-4">📎</div>
+          <div className="text-5xl mb-4">📚</div>
           <h2 className="text-3xl font-bold text-gray-900">
             {isRegistering ? "注册账号" : "登录智能错题本"}
           </h2>
@@ -73,59 +57,43 @@ export default function LoginPage() {
           <div className="space-y-4">
             {isRegistering && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  姓名
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">姓名</label>
                 <input
                   type="text"
                   className="input"
                   value={formData.name}
-                  onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="请输入姓名"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                邮箱
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
               <input
                 type="email"
                 className="input"
                 value={formData.email}
-                onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 placeholder="请输入邮箱"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                密码
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">密码</label>
               <input
                 type="password"
                 className="input"
                 value={formData.password}
-                onChange={(e) =>
-                  setFormData({ ...formData, password: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 placeholder="请输入密码"
                 required
               />
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full btn-primary disabled:opacity-50"
-          >
+          <button type="submit" disabled={loading} className="w-full btn-primary disabled:opacity-50">
             {loading ? "处理中..." : isRegistering ? "注册" : "登录"}
           </button>
 
