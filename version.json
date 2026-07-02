@@ -2,5 +2,5 @@
   "versionCode": 2,
   "versionName": "1.1",
   "apkUrl": "https://gitee.com/jiang-zhengyu666/smart-mistake-book/releases/download/v1.1/app-debug.apk",
-  "releaseNotes": "淇 AI 鍒嗘瀽鍔熻兘锛圓PI 瀵嗛挜鏈祵鍏ラ棶棰橈級"
+  "releaseNotes": "修复 AI 分析功能（API 密钥嵌入问题）"
 }
