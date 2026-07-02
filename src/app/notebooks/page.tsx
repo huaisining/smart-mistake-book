@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Sidebar from "@/components/Sidebar";
 import toast, { Toaster } from "react-hot-toast";
 
 const COLOR_OPTIONS = [
@@ -91,9 +90,7 @@ export default function NotebooksPage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-
+    <div className="mx-auto max-w-5xl px-4 py-6">
       <main className="flex-1 p-8">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">

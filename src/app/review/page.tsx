@@ -3,7 +3,6 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Sidebar from '@/components/Sidebar';
 import toast, { Toaster } from 'react-hot-toast';
 import { Mistake } from '@/types';
 import { getMistakes, reviewMistake } from '@/lib/local-db';
@@ -80,8 +79,7 @@ function ReviewContent() {
 
   if (dueMistakes.length === 0 || reviewComplete) {
     return (
-      <div className="flex min-h-screen bg-gray-50">
-        <Sidebar />
+      <div className="mx-auto max-w-5xl px-4 py-6">
         <main className="flex-1 p-8 flex items-center justify-center">
           <div className="card text-center max-w-md">
             <div className="text-6xl mb-4">🎉</div>
@@ -103,9 +101,7 @@ function ReviewContent() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      
+    <div className="mx-auto max-w-5xl px-4 py-6">
       <main className="flex-1 p-8">
         <div className="max-w-3xl mx-auto">
           {/* Progress */}

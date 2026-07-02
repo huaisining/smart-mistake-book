@@ -1,9 +1,9 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import "./globals.css";
-// katex removed for static export
 
 import { Inter } from "next/font/google";
 import { AuthProvider } from "@/lib/auth-context";
+import Navbar from "@/components/Navbar";
 import UpdatePrompt from "@/components/UpdatePrompt";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,9 +20,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-CN">
-      <body className={inter.className}>
+      <body className={inter.className + " min-h-screen bg-background antialiased"}>
         <AuthProvider>
-          {children}
+          <Navbar />
+          <main className="flex-1">{children}</main>
           <UpdatePrompt />
         </AuthProvider>
       </body>

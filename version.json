@@ -1,6 +1,6 @@
 {
-  "versionCode": 5,
-  "versionName": "1.4",
-  "apkUrl": "https://gitee.com/jiang-zhengyu666/smart-mistake-book/releases/download/v1.4/app-debug.apk",
-  "releaseNotes": "📷 拍照上传 · 🖼️ 相册选择"
+  "versionCode": 6,
+  "versionName": "1.5",
+  "apkUrl": "https://gitee.com/jiang-zhengyu666/smart-mistake-book/releases/download/v1.5/app-debug.apk",
+  "releaseNotes": "📷 拍照上传 · 🔍 手动检查更新按钮"
 }

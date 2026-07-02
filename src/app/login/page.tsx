@@ -3,6 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BookOpen, Mail, Lock, User, LogIn } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function LoginPage() {
@@ -18,98 +22,55 @@ export default function LoginPage() {
     try {
       if (isRegistering) {
         const result = await localRegister(formData.email, formData.password, formData.name);
-        if (result.success) {
-          toast.success("注册成功！请登录");
-          setIsRegistering(false);
-        } else {
-          toast.error(result.error || "注册失败");
-        }
+        if (result.success) { toast.success("注册成功！请登录"); setIsRegistering(false); }
+        else { toast.error(result.error || "注册失败"); }
       } else {
         const result = await login(formData.email, formData.password);
-        if (!result.success) {
-          toast.error(result.error || "登录失败，请检查账号密码");
-        } else {
-          toast.success("登录成功！");
-          router.push("/dashboard");
-        }
+        if (!result.success) { toast.error(result.error || "登录失败"); }
+        else { toast.success("登录成功！"); router.push("/dashboard"); }
       }
-    } catch (error) {
-      toast.error("网络错误，请重试");
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { toast.error("网络错误，请重试"); }
+    finally { setLoading(false); }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-50 to-accent-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <div className="text-5xl mb-4">📚</div>
-          <h2 className="text-3xl font-bold text-gray-900">
-            {isRegistering ? "注册账号" : "登录智能错题本"}
-          </h2>
-          <p className="mt-2 text-gray-600">
-            {isRegistering ? "创建您的学习账户" : "开始您的智能学习之旅"}
-          </p>
-        </div>
-
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 px-4">
+      <Card className="w-full max-w-sm">
+        <CardHeader className="text-center space-y-2">
+          <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit">
+            <BookOpen className="h-6 w-6 text-primary" />
+          </div>
+          <CardTitle className="text-xl">{isRegistering ? "注册账号" : "智能错题本"}</CardTitle>
+          <CardDescription>{isRegistering ? "创建您的学习账户" : "登录以继续学习"}</CardDescription>
+        </CardHeader>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
             {isRegistering && (
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">姓名</label>
-                <input
-                  type="text"
-                  className="input"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="请输入姓名"
-                />
+              <div className="relative">
+                <User className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input className="pl-9" placeholder="姓名（选填）" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
               </div>
             )}
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
-              <input
-                type="email"
-                className="input"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="请输入邮箱"
-                required
-              />
+            <div className="relative">
+              <Mail className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input className="pl-9" type="email" placeholder="邮箱" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">密码</label>
-              <input
-                type="password"
-                className="input"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="请输入密码"
-                required
-              />
+            <div className="relative">
+              <Lock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input className="pl-9" type="password" placeholder="密码" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} required />
             </div>
-          </div>
-
-          <button type="submit" disabled={loading} className="w-full btn-primary disabled:opacity-50">
-            {loading ? "处理中..." : isRegistering ? "注册" : "登录"}
-          </button>
-
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setIsRegistering(!isRegistering)}
-              className="text-primary-600 hover:text-primary-700 text-sm"
-            >
-              {isRegistering ? "已有账号？登录" : "没有账号？注册"}
-            </button>
-          </div>
+            <Button type="submit" className="w-full gap-2" disabled={loading}>
+              <LogIn className="h-4 w-4" /> {loading ? "处理中..." : isRegistering ? "注册" : "登录"}
+            </Button>
+          </CardContent>
         </form>
-      </div>
-
-      <Toaster position="top-right" />
+        <div className="px-6 pb-6 text-center">
+          <Button variant="link" className="text-sm" onClick={() => setIsRegistering(!isRegistering)}>
+            {isRegistering ? "已有账号？登录" : "没有账号？注册"}
+          </Button>
+        </div>
+      </Card>
+      <Toaster position="top-center" />
     </div>
   );
 }

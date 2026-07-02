@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { getNotebooks, createMistake } from "@/lib/local-db";
-import Sidebar from "@/components/Sidebar";
 import MarkdownWithMath from "@/components/MarkdownWithMath";
 import { fullAnalyzeMistake, callAIApi } from "@/lib/ai-service";
 import toast, { Toaster } from "react-hot-toast";
@@ -27,6 +26,7 @@ const TYPE_LABELS: Record<string, string> = {
 export default function AddMistakePage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<number>(1);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -61,7 +61,6 @@ export default function AddMistakePage() {
     reader.readAsDataURL(file);
   };
 
-  const handleDrop = (e: React.DragEvent) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f && f.type.startsWith("image/")) handleFileSelect(f); };
   const startEdit = (field: string, val: string) => { setEditField(field); setEditValue(val); };
   const saveEdit = () => { if (!analysisResult) return; setAnalysisResult({ ...analysisResult, [editField as keyof AnalysisResult]: editValue }); setEditField(null); };
 
@@ -109,16 +108,24 @@ export default function AddMistakePage() {
   if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div></div>;
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <main className="flex-1 p-8">
+    <div className="mx-auto max-w-2xl"><main className="flex-1 p-8">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-8">添加错题</h1>
-          {step === 1 && <div className="space-y-6">
-            <div className={`card border-2 border-dashed text-center py-12 cursor-pointer transition-colors ${dragOver ? "border-primary-500 bg-primary-50" : "border-gray-300 hover:border-primary-400"}`} onDragOver={e => { e.preventDefault(); setDragOver(true); }} onDragLeave={() => setDragOver(false)} onDrop={handleDrop} onClick={() => fileInputRef.current?.click()}>
-              <div className="text-6xl mb-4">📸</div><p className="text-xl font-semibold mb-2">点击或拖拽上传错题照片</p><p className="text-gray-500">支持 JPG、PNG，最大 10MB</p>
+          {step === 1 && <div className="space-y-4">
+            <div className="card">
+              <p className="text-sm font-medium text-gray-700 mb-3">选择图片上传方式</p>
+              <div className="grid grid-cols-2 gap-3">
+                <button onClick={() => cameraInputRef.current?.click()} className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-gray-300 hover:border-primary-400 hover:bg-primary-50/50 transition-colors">
+                  <span className="text-3xl">📷</span><span className="text-sm font-medium text-gray-700">拍照</span><span className="text-xs text-gray-400">调用系统相机</span>
+                </button>
+                <button onClick={() => fileInputRef.current?.click()} className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-gray-300 hover:border-primary-400 hover:bg-primary-50/50 transition-colors">
+                  <span className="text-3xl">🖼️</span><span className="text-sm font-medium text-gray-700">相册</span><span className="text-xs text-gray-400">从图库选择</span>
+                </button>
+              </div>
+              <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); }} />
               <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={e => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); }} />
             </div>
+            
             {uploadedImageUrl && <div className="card"><img src={uploadedImageUrl} alt="上传的错题图片" className="max-h-96 mx-auto rounded-lg" /></div>}
             <div className="card"><label className="block text-sm font-medium text-gray-700 mb-2">题目文字补充（可选）</label><textarea className="input min-h-[80px]" value={textInput} onChange={e => setTextInput(e.target.value)} placeholder="如果图片不清晰，可以手动输入题目文字..." /></div>
             <button onClick={handleStartAnalysis} disabled={!uploadedImageUrl && !textInput} className="btn-primary w-full disabled:opacity-50">🚀 开始 AI 分析</button>
