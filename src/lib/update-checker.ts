@@ -15,7 +15,7 @@ export async function checkForUpdate(): Promise<UpdateInfo | null> {
     const response = await fetch(UPDATE_CONFIG_URL, { signal: controller.signal });
     clearTimeout(timeoutId);
     if (!response.ok) return null;
-    const data: UpdateInfo = await response.json();
+    const text = await response.text(); const data: UpdateInfo = JSON.parse(text.replace(/^\uFEFF/, ''));
     if (data.versionCode > CURRENT_VERSION) return data;
     return null;
   } catch {
