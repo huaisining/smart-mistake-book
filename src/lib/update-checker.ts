@@ -1,6 +1,6 @@
-// 鎼存梻鏁ら崘鍛纯閺傜増顥呭ù瀣箛閸?// 閸氼垰濮╅弮鑸殿梾閺屻儲婀囬崝鈥虫珤娑撳﹦娈戦張鈧弬鎵閺堫剨绱濋張澶嬫煀閻楀牊婀伴幓鎰仛閻劍鍩涙稉瀣祰鐎瑰顥?
+// 閹煎瓨姊婚弫銈夊礃閸涱喗绾柡鍌滃椤ュ懎霉鐎ｎ偅绠涢柛?// 闁告凹鍨版慨鈺呭籍閼告姊鹃柡灞诲劜濠€鍥礉閳ヨ櫕鐝ゅ☉鎾筹功濞堟垿寮甸埀顒勫棘閹殿喖顣奸柡鍫墾缁辨繈寮垫径瀣厐闁绘鐗婂﹢浼村箵閹邦喓浠涢柣顫妽閸╂稒绋夌€ｎ厽绁伴悗鐟邦槼椤?
 const UPDATE_CONFIG_URL = "https://gitee.com/jiang-zhengyu666/smart-mistake-book/raw/master/version.json";
-const CURRENT_VERSION = 3; // 娑?build.gradle 娑擃厾娈?versionCode 娣囨繃瀵旀稉鈧懛?
+const CURRENT_VERSION = 4; // 濞?build.gradle 濞戞搩鍘惧▓?versionCode 濞ｅ洦绻冪€垫梹绋夐埀顒勬嚊?
 export interface UpdateInfo {
   versionCode: number;
   versionName: string;
@@ -25,5 +25,5 @@ export async function checkForUpdate(): Promise<UpdateInfo | null> {
 }
 
 export function downloadUpdate(apkUrl: string): void {
-  // 閻劎閮寸紒鐔哥セ鐟欏牆娅掓稉瀣祰 APK閿涘奔绗呮潪钘夌暚閹存劕鎮楅悽銊﹀煕閻愮懓鍤崡鍐插讲鐎瑰顥?  window.open(apkUrl, "_blank");
+  // 闁活潿鍔庨柈瀵哥磼閻斿摜銈婚悷娆忕墕濞呮帗绋夌€ｎ厽绁?APK闁挎稑濂旂粭鍛姜閽樺鏆氶柟瀛樺姇閹鎮介妸锕€鐓曢柣鎰嚀閸ゎ噣宕￠崘鎻掕閻庣懓顦抽ˉ?  window.open(apkUrl, "_blank");
 }
